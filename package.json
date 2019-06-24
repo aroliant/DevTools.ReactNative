@@ -1,0 +1,42 @@
+{
+  "name": "DevToolsReactNative",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "node node_modules/react-native/local-cli/cli.js start",
+    "test": "jest",
+    "android": "react-native run-android",
+    "ios": "react-native run-ios",
+    "android:release": "react-native run-android --variant=release",
+    "fix:gradle": "chmod +x gradlew",
+    "clean": "cd android && ./gradlew clean && cd ../",
+    "reload": "sh reload.sh"
+  },
+  "dependencies": {
+    "assert": "^2.0.0",
+    "buffer-browserify": "^0.2.5",
+    "crypto-browserify": "^3.12.0",
+    "crypto-js": "^3.1.9-1",
+    "events-browserify": "^0.0.1",
+    "js-beautify": "^1.10.0",
+    "js-md2": "^0.2.2",
+    "js-md4": "^0.3.2",
+    "react": "16.8.3",
+    "react-native": "0.59.4",
+    "stream-browserify": "^2.0.2",
+    "vm-browserify": "^1.1.0",
+    "xml-js": "^1.6.11"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.4.5",
+    "@babel/runtime": "^7.4.5",
+    "babel-jest": "^24.8.0",
+    "babel-plugin-rewrite-require": "^1.14.5",
+    "jest": "^24.8.0",
+    "metro-react-native-babel-preset": "^0.54.1",
+    "react-test-renderer": "16.8.3"
+  },
+  "jest": {
+    "preset": "react-native"
+  }
+}
