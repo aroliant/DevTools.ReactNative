@@ -1,6 +1,10 @@
 import React from 'react';
-import { BackHandler, Button, Dimensions, FlatList, KeyboardAvoidingView, Picker, StyleSheet, Text, TextInput, TouchableHighlight, View } from 'react-native';
+import { BackHandler, Dimensions, FlatList, KeyboardAvoidingView, Picker, ScrollView, StyleSheet, Text, TextInput, TouchableHighlight, View } from 'react-native';
+import { SearchBar, Button } from 'react-native-elements';
+
+// Other Imports 
 import * as services from './services';
+
 
 const tools = require('./assets/tools.json')
 
@@ -17,7 +21,9 @@ export default class App extends React.Component {
       pickerSelectedIndex: 0,
       input: "",
       output: "",
-      buttonText: "Press Me"
+      buttonText: "Press Me",
+      searchKeyword: '',
+      isProcessing: false,
     };
 
   }
@@ -67,78 +73,100 @@ export default class App extends React.Component {
 
 
   generateOutput() {
-    this.setState({ buttonText: this.state.selectedItem.processString + '...' });
+    this.setState({ buttonText: this.state.selectedItem.processString + '...', isProcessing: true });
     const serviceName = this.state.selectedItem.service;
     const toolName = this.state.selectedItem.functions[this.state.pickerSelectedIndex];
 
     this.state.output = services[serviceName][toolName](this.state.input)
     this.state.buttonText = this.state.selectedItem.button;
 
-    this.setState({ buttonText: this.state.selectedItem.button });
+    this.setState({ buttonText: this.state.selectedItem.button, isProcessing: false });
     return;
   }
 
+  search(search) {
+    this.setState({ searchKeyword: search })
+  }
+
   render() {
+    const searchKeyword = this.state.searchKeyword
     if (this.state.showToolsList == true) {
       return (
-        <FlatList
-          data={this.state.tools}
-          style={styles.container}
-          keyExtractor={(item, index) => index.toString()}
-          renderItem={this.renderItem}
-          numColumns={2} />
+        <ScrollView>
+          <SearchBar
+            placeholder="Type Here..."
+            onChangeText={this.search}
+            value={searchKeyword}
+          />
+          <FlatList
+            data={this.state.tools}
+            style={styles.container}
+            keyExtractor={(item, index) => index.toString()}
+            renderItem={this.renderItem}
+            numColumns={2} />
+        </ScrollView>
+
       );
     }
     if (this.state.showToolScreen == true) {
       return (
-        <KeyboardAvoidingView behavior="padding" style={styles.form}>
-          <Text>Input Here:</Text>
-          <TextInput
-            style={styles.input}
-            value={this.state.input}
-            onChangeText={input => this.setState({ input })}
-            placeholder="Input Here..."
-            autoCapitalize="none"
-            autoCorrect={false}
-            keyboardType="default"
-            returnKeyType="send"
-            multiline={true}
-            returnKeyType='none'
-            onSubmitEditing={this._submit}
-            blurOnSubmit={true}
-          />
-          <Text>Select one of the Below</Text>
-          <Picker
-            selectedValue={this.state.selectedItem.select[this.state.pickerSelectedIndex]}
-            style={{ height: 50, width: 400 }}
-            onValueChange={(itemValue, itemIndex) =>
-              this.setState({ pickerSelectedIndex: itemIndex })
-            }>
-            {
-              this.state.selectedItem.select.map((item, index) => (
-                <Picker.Item label={item} value={item} key={index.toString()} />
-              ))
-            }
-          </Picker>
-          <View>
-            <Button title={this.state.buttonText} onPress={() => this.generateOutput()} />
-          </View>
-          <Text>Outputs Here:</Text>
-          <TextInput
-            style={styles.input}
-            value={this.state.output}
-            onChangeText={output => this.setState({ output })}
-            placeholder="Output goes Here..."
-            autoCapitalize="none"
-            autoCorrect={false}
-            keyboardType="default"
-            returnKeyType="send"
-            multiline={true}
-            returnKeyType='none'
-            onSubmitEditing={this._submit}
-            blurOnSubmit={true}
-          />
-        </KeyboardAvoidingView>
+        <ScrollView>
+          <KeyboardAvoidingView behavior="padding" style={styles.form}>
+            <TextInput
+              style={styles.input}
+              value={this.state.input}
+              onChangeText={input => this.setState({ input })}
+              placeholder="Input"
+              autoCapitalize="none"
+              autoCorrect={false}
+              keyboardType="default"
+              returnKeyType="send"
+              multiline={true}
+              returnKeyType='none'
+              onSubmitEditing={this._submit}
+              blurOnSubmit={true}
+            />
+            <TextInput
+              style={styles.input}
+              value={this.state.output}
+              onChangeText={output => this.setState({ output })}
+              placeholder="Output"
+              autoCapitalize="none"
+              autoCorrect={false}
+              keyboardType="default"
+              returnKeyType="send"
+              multiline={true}
+              returnKeyType='none'
+              onSubmitEditing={this._submit}
+              blurOnSubmit={true}
+            />
+
+            <View style={{ flex: 1, flexDirection: 'row' }}>
+              <Text style={{ width: 100 }}>Select a Tool</Text>
+              <Picker
+                selectedValue={this.state.selectedItem.select[this.state.pickerSelectedIndex]}
+                style={{ height: 50, width: 200 }}
+                onValueChange={(itemValue, itemIndex) =>
+                  this.setState({ pickerSelectedIndex: itemIndex })
+                }
+                >
+                {
+                  this.state.selectedItem.select.map((item, index) => (
+                    <Picker.Item label={item} value={item} key={index.toString()} />
+                  ))
+                }
+              </Picker>
+            </View>
+
+            <View>
+              <Button
+                title={this.state.buttonText}
+                loading={this.state.isProcessing}
+                style={styles.processBtn} onPress={() => this.generateOutput()}
+              />
+            </View>
+          </KeyboardAvoidingView>
+        </ScrollView>
       )
     }
   }
@@ -147,7 +175,7 @@ export default class App extends React.Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginVertical: 20,
+    marginVertical: 0,
   },
   item: {
     backgroundColor: '#6495ED',
@@ -173,14 +201,17 @@ const styles = StyleSheet.create({
     color: 'white',
   },
   input: {
-    margin: 20,
-    marginBottom: 0,
+    margin: 10,
     height: 150,
     paddingHorizontal: 10,
     borderRadius: 4,
     borderColor: '#ccc',
     borderWidth: 1,
     fontSize: 16,
+    textAlignVertical: "top"
+  },
+  processBtn: {
+    marginTop: 10,
   },
   legal: {
     margin: 10,

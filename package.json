@@ -1,5 +1,5 @@
 {
-  "name": "DevToolsReactNative",
+  "name": "devtools",
   "version": "0.0.1",
   "private": true,
   "scripts": {
@@ -8,7 +8,7 @@
     "android": "react-native run-android",
     "ios": "react-native run-ios",
     "android:release": "react-native run-android --variant=release",
-    "fix:gradle": "chmod +x gradlew",
+    "fix:gradle": "cd android && chmod +x gradlew && cd ../",
     "clean": "cd android && ./gradlew clean && cd ../",
     "reload": "sh reload.sh"
   },
@@ -23,6 +23,8 @@
     "js-md4": "^0.3.2",
     "react": "16.8.3",
     "react-native": "0.59.4",
+    "react-native-elements": "^1.1.0",
+    "react-native-vector-icons": "^6.5.0",
     "stream-browserify": "^2.0.2",
     "vm-browserify": "^1.1.0",
     "xml-js": "^1.6.11"
